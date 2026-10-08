@@ -4,29 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Snack Cart Tracker</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 
 /* ── VARIABLES ────────────────────────────────────────────── */
 :root {
-  --navy:      #0A1628;
-  --navy-mid:  #112240;
-  --navy-lite: #1C3461;
-  --amber:     #F59E0B;
-  --green:     #10B981;
-  --red:       #EF4444;
-  --white:     #FFFFFF;
-  --off-white: #F0F4FF;
-  --muted:     #8899BB;
-  --border:    rgba(255,255,255,0.08);
-  --card-bg:   rgba(17,34,64,0.7);
-  --f1:#6366F1; --f2:#8B5CF6; --f3:#EC4899; --f4:#EF4444; --f5:#F59E0B;
-  --f6:#10B981; --f7:#0EA5E9; --f8:#3B82F6; --f9:#14B8A6; --f10:#F97316;
-  --font: 'DM Sans', sans-serif;
-  --mono: 'DM Mono', monospace;
-  --radius: 14px;
-  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --bg:        #f5f5f7;
+  --surface:   #ffffff;
+  --surface-2: #e8e8ed;
+  --accent:    #0071e3;
+  --accent-rgb: 0,113,227;
+  --green:     #30d158;
+  --red:       #ff3b30;
+  --text:          #1d1d1f;
+  --text-secondary: #424245;
+  --text-muted:     #6e6e73;
+  --border:    #d2d2d7;
+  --card-bg:   #ffffff;
+  --f1:#5e5ce6; --f2:#af52de; --f3:#ff375f; --f4:#ff3b30; --f5:#ff9500;
+  --f6:#30d158; --f7:#0071e3; --f8:#007aff; --f9:#00c7be; --f10:#ff9f0a;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  --mono: var(--font);
+  --radius: 18px;
+  --shadow: 0 12px 28px rgba(0,0,0,0.08);
 }
 
 /* ── RESET ────────────────────────────────────────────────── */
@@ -34,15 +33,11 @@
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   font-family: var(--font);
-  background: var(--navy);
-  color: var(--white);
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
-  background-image:
-    linear-gradient(rgba(14,165,233,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14,165,233,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
 }
 
 /* ── STATUS BAR ───────────────────────────────────────────── */
@@ -52,17 +47,17 @@ body {
   justify-content: space-between;
   font-size: 0.65rem;
   font-family: var(--mono);
-  color: var(--muted);
+  color: var(--text-muted);
   padding: 8px 16px;
   border-bottom: 1px solid var(--border);
-  background: var(--navy);
-  letter-spacing: 0.05em;
+  background: var(--bg);
+  letter-spacing: 0.01em;
 }
 .sync-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.04);
   border: 1px solid var(--border);
   padding: 2px 10px;
   border-radius: 20px;
@@ -76,12 +71,11 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--navy-mid);
+  background: rgba(255,255,255,0.8);
   border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px) saturate(1.8);
+  -webkit-backdrop-filter: blur(12px) saturate(1.8);
   padding: 16px 20px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
 }
 .header-inner {
   max-width: 700px;
@@ -93,7 +87,7 @@ body {
 .cart-icon {
   font-size: 2.2rem;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 8px rgba(245,158,11,0.5));
+  filter: drop-shadow(0 2px 6px rgba(var(--accent-rgb),0.35));
   animation: float 3s ease-in-out infinite;
 }
 @keyframes float {
@@ -103,16 +97,18 @@ body {
 .banner-text { flex: 1; min-width: 0; }
 .banner-text h1 {
   font-size: clamp(1rem, 4vw, 1.3rem);
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.2;
 }
 #current-floor-label {
-  color: var(--amber);
+  color: var(--accent);
+  font-weight: 700;
   font-size: clamp(1.1rem, 5vw, 1.5rem);
 }
 .banner-sub {
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--text-muted);
   margin-top: 3px;
   font-family: var(--mono);
 }
@@ -132,16 +128,16 @@ body {
   flex-shrink: 0;
   font-size: 0.7rem;
   font-family: var(--mono);
-  color: var(--muted);
-  background: rgba(255,255,255,0.05);
+  color: var(--text-muted);
+  background: rgba(0,0,0,0.04);
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 5px 10px;
   cursor: pointer;
   white-space: nowrap;
 }
-.identity-chip:hover { border-color: var(--amber); color: var(--off-white); }
-.identity-chip span { color: var(--amber); font-weight: 600; }
+.identity-chip:hover { border-color: var(--accent); color: var(--text); }
+.identity-chip span { color: var(--accent); font-weight: 600; }
 
 /* ── MAIN ─────────────────────────────────────────────────── */
 main {
@@ -153,18 +149,19 @@ main {
 /* ── SETUP BANNER ─────────────────────────────────────────── */
 #setup-banner {
   display: none;
-  background: rgba(239,68,68,0.1);
+  background: rgba(255,59,48,0.08);
   border: 1px solid var(--red);
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 24px;
   font-size: 0.85rem;
   line-height: 1.5;
+  color: var(--text);
 }
 #setup-banner.show { display: block; }
 #setup-banner code {
   font-family: var(--mono);
-  background: rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.06);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.8rem;
@@ -176,7 +173,7 @@ main {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--text-muted);
   margin-bottom: 12px;
   padding-left: 4px;
   display: flex;
@@ -196,14 +193,14 @@ main {
   .floor-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .floor-btn {
-  --accent: #0EA5E9;
+  --accent: #0071e3;
   position: relative;
   background: var(--card-bg);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px 8px;
   cursor: pointer;
-  color: var(--white);
+  color: var(--text);
   font-family: var(--font);
   font-size: 0.9rem;
   font-weight: 600;
@@ -213,6 +210,7 @@ main {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   min-height: 72px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .floor-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .floor-btn::before {
@@ -223,17 +221,17 @@ main {
   transition: opacity 0.15s;
   border-radius: calc(var(--radius) - 1px);
 }
-.floor-btn:hover  { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.4); border-color:var(--accent); }
+.floor-btn:hover  { transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.1); border-color:var(--accent); }
 .floor-btn:active { transform:scale(0.96); }
-.floor-btn:hover::before { opacity:0.12; }
+.floor-btn:hover::before { opacity:0.07; }
 .floor-btn .floor-num {
   display:block; font-size:1.4rem; font-weight:700;
   line-height:1; margin-bottom:2px; color:var(--accent);
 }
 .floor-btn.is-current {
   border-color: var(--accent);
-  background: rgba(255,255,255,0.06);
-  box-shadow: 0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent), var(--shadow);
+  background: color-mix(in srgb, var(--accent) 8%, white);
+  box-shadow: 0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent), var(--shadow);
 }
 .floor-btn.is-current::after {
   content:'●'; position:absolute; top:5px; right:8px;
@@ -251,11 +249,19 @@ main {
 .floor-btn[data-floor="10"] { --accent:var(--f10); }
 
 /* ── TIMELINE ─────────────────────────────────────────────── */
-.timeline { margin-bottom: 32px; }
-.timeline-list { list-style:none; position:relative; padding-left:28px; }
+.timeline { margin-bottom: 32px; position:relative; }
+.timeline-list {
+  list-style:none; position:relative; padding-left:28px; padding-right:6px;
+  max-height: 300px; overflow-y:auto;
+}
+.timeline::after {
+  content:''; position:absolute; left:0; right:6px; bottom:0; height:28px;
+  background:linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events:none;
+}
 .timeline-list::before {
   content:''; position:absolute; left:8px; top:8px; bottom:8px;
-  width:2px; background:linear-gradient(to bottom,var(--amber),#0EA5E9); border-radius:2px;
+  width:2px; background:var(--border); border-radius:2px;
 }
 .tl-item { position:relative; margin-bottom:14px; animation:slideIn 0.3s ease both; }
 @keyframes slideIn {
@@ -265,128 +271,192 @@ main {
 .tl-item::before {
   content:''; position:absolute; left:-24px; top:10px;
   width:10px; height:10px; background:var(--accent,#0EA5E9);
-  border-radius:50%; border:2px solid var(--navy); z-index:1;
+  border-radius:50%; border:2px solid var(--bg); z-index:1;
 }
 .tl-item.tl-current::before {
-  background:var(--amber);
-  box-shadow:0 0 0 4px rgba(245,158,11,0.25);
+  background:var(--accent);
+  box-shadow:0 0 0 4px rgba(var(--accent-rgb),0.2);
   animation:pulse 2s infinite;
 }
 .tl-card {
   background:var(--card-bg); border:1px solid var(--border);
-  border-radius:10px; padding:10px 14px;
+  border-radius:14px; padding:10px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.04);
   display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;
 }
 .tl-floor { font-weight:700; font-size:0.95rem; color:var(--accent,#0EA5E9); }
-.tl-floor.is-now { color:var(--amber); }
-.tl-who { font-size:0.7rem; color:var(--muted); font-family:var(--mono); }
-.tl-time { font-size:0.72rem; font-family:var(--mono); color:var(--muted); text-align:right; }
+.tl-floor.is-now { color:var(--accent); }
+.tl-who { font-size:0.7rem; color:var(--text-muted); font-family:var(--mono); }
+.tl-time { font-size:0.72rem; font-family:var(--mono); color:var(--text-muted); text-align:right; }
 .tl-badge-now {
-  background:var(--amber); color:var(--navy);
+  background:var(--accent); color:#fff;
   font-size:0.62rem; font-weight:700; letter-spacing:0.08em;
   padding:2px 7px; border-radius:20px; text-transform:uppercase;
-}
-
-/* ── TABLE ────────────────────────────────────────────────── */
-.table-wrap {
-  overflow-x:auto; border-radius:var(--radius);
-  border:1px solid var(--border); margin-bottom:32px;
-  -webkit-overflow-scrolling:touch;
-}
-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
-thead th {
-  background:var(--navy-lite); padding:10px 14px; text-align:left;
-  font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase;
-  color:var(--muted); font-weight:600; white-space:nowrap;
-}
-tbody tr { border-top:1px solid var(--border); transition:background 0.1s; }
-tbody tr:hover { background:rgba(255,255,255,0.03); }
-tbody td { padding:10px 14px; color:var(--off-white); font-family:var(--mono); font-size:0.78rem; white-space:nowrap; }
-.badge-floor {
-  display:inline-block; padding:2px 9px; border-radius:20px;
-  font-weight:700; font-size:0.75rem; background:rgba(255,255,255,0.07); border:1px solid transparent;
 }
 
 /* ── HEATMAP ──────────────────────────────────────────────── */
 .heatmap { margin-bottom:32px; }
 .heatmap-grid { display:flex; flex-direction:column; gap:6px; }
 .hm-row { display:flex; align-items:center; gap:10px; }
-.hm-label { font-size:0.75rem; font-family:var(--mono); color:var(--muted); width:56px; flex-shrink:0; text-align:right; }
-.hm-bar-wrap { flex:1; height:22px; background:rgba(255,255,255,0.04); border-radius:6px; overflow:hidden; }
+.hm-label { font-size:0.75rem; font-family:var(--mono); color:var(--text-muted); width:56px; flex-shrink:0; text-align:right; }
+.hm-bar-wrap { flex:1; height:22px; background:rgba(0,0,0,0.05); border-radius:6px; overflow:hidden; position:relative; }
 .hm-bar { height:100%; border-radius:6px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); position:relative; }
 .hm-bar::after {
   content:attr(data-count); position:absolute; right:8px; top:50%; transform:translateY(-50%);
-  font-size:0.65rem; font-family:var(--mono); color:rgba(255,255,255,0.7); font-weight:600;
+  font-size:0.65rem; font-family:var(--mono); color:rgba(255,255,255,0.9); font-weight:600;
 }
-.hm-count { font-size:0.7rem; font-family:var(--mono); color:var(--muted); width:24px; text-align:right; flex-shrink:0; }
+.hm-current-badge {
+  display:none; position:absolute; left:8px; top:50%; transform:translateY(-50%);
+  align-items:center; gap:4px; font-size:0.66rem; font-weight:700;
+  color:#fff; text-shadow:0 1px 2px rgba(0,0,0,0.45); white-space:nowrap; z-index:1;
+}
+.hm-current-badge.show { display:flex; }
+.hm-count { font-size:0.7rem; font-family:var(--mono); color:var(--text-muted); min-width:24px; text-align:right; flex-shrink:0; white-space:nowrap; }
+.hm-row.is-current .hm-label { color:var(--text); font-weight:700; }
+.hm-row.is-current .hm-count { color:var(--accent); font-weight:700; }
+.hm-row.is-current .hm-bar-wrap { box-shadow:0 0 0 2px var(--accent); }
+
+/* ── REWARDS ──────────────────────────────────────────────── */
+.rewards-card {
+  background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 18px; margin-bottom:32px; box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  display:flex; align-items:center; gap:14px;
+}
+.rewards-badge-icon { font-size:2rem; flex-shrink:0; line-height:1; }
+.rewards-info { flex:1; min-width:0; }
+.rewards-title { font-weight:700; font-size:0.95rem; }
+.rewards-sub { font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
+.rewards-progress-track {
+  height:6px; border-radius:3px; background:rgba(0,0,0,0.06); margin-top:8px; overflow:hidden;
+}
+.rewards-progress-fill { height:100%; border-radius:3px; background:var(--accent); transition:width 0.4s ease; }
+.cooldown-banner {
+  display:none; align-items:center; justify-content:center; gap:8px;
+  background:rgba(0,0,0,0.04); border:1px solid var(--border); border-radius:var(--radius);
+  padding:14px; margin-bottom:32px; font-size:0.85rem; color:var(--text-muted); text-align:center;
+}
+.cooldown-banner.show { display:flex; }
+.cooldown-banner strong { color:var(--text); font-family:var(--mono); }
+
+/* ── COMMENTS ─────────────────────────────────────────────── */
+.comments { margin-bottom:32px; }
+.comment-composer { display:flex; gap:8px; margin-bottom:16px; }
+.comment-composer input {
+  flex:1; background:var(--card-bg); border:1.5px solid var(--border); border-radius:980px;
+  padding:11px 18px; color:var(--text); font-family:var(--font); font-size:0.9rem; outline:none;
+  transition:border-color 0.15s;
+}
+.comment-composer input:focus { border-color:var(--accent); }
+.comment-composer button {
+  background:var(--accent); color:#fff; border:none; border-radius:980px;
+  padding:11px 20px; font-family:var(--font); font-size:0.9rem; font-weight:600; cursor:pointer;
+  flex-shrink:0; transition:opacity 0.1s;
+}
+.comment-composer button:hover { opacity:0.9; }
+.comment-composer button:disabled { opacity:0.5; cursor:not-allowed; }
+.comment-list { display:flex; flex-direction:column; gap:10px; }
+.comment-card {
+  background:var(--card-bg); border:1px solid var(--border); border-radius:14px;
+  padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.04);
+}
+.comment-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:4px; }
+.comment-author { font-weight:700; font-size:0.85rem; }
+.comment-time { font-size:0.7rem; color:var(--text-muted); font-family:var(--mono); white-space:nowrap; }
+.comment-body { font-size:0.88rem; line-height:1.4; margin-bottom:8px; word-wrap:break-word; }
+.reaction-row { display:flex; gap:6px; flex-wrap:wrap; }
+.reaction-pill {
+  display:inline-flex; align-items:center; gap:4px; background:rgba(0,0,0,0.04);
+  border:1px solid var(--border); border-radius:980px; padding:3px 9px;
+  font-size:0.78rem; cursor:pointer; transition:background 0.1s, border-color 0.1s;
+}
+.reaction-pill:hover { border-color:var(--accent); }
+.reaction-pill.mine { background:color-mix(in srgb, var(--accent) 12%, white); border-color:var(--accent); }
+.reaction-pill .count { font-family:var(--mono); color:var(--text-muted); }
 
 /* ── MODAL ────────────────────────────────────────────────── */
 .modal-overlay {
   display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,0.75);
+  background:rgba(0,0,0,0.4);
   backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-  z-index:200; align-items:flex-end; justify-content:center;
+  z-index:200; align-items:center; justify-content:center;
+  padding: 20px;
 }
 .modal-overlay.open { display:flex; }
 .modal {
-  background:var(--navy-mid); border:1px solid var(--border);
-  border-radius:24px 24px 0 0; padding:28px 24px 48px;
-  width:100%; max-width:500px;
-  animation:slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:32px 28px;
+  width:100%; max-width:420px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+  animation:popIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
 }
-@keyframes slideUp {
-  from { transform:translateY(100%); opacity:0; }
-  to   { transform:translateY(0); opacity:1; }
+@keyframes popIn {
+  from { transform:scale(0.94); opacity:0; }
+  to   { transform:scale(1); opacity:1; }
 }
-.modal h2 { font-size:1.2rem; font-weight:700; margin-bottom:4px; }
-.modal h2 span { color:var(--amber); }
-.modal p { font-size:0.82rem; color:var(--muted); margin-bottom:20px; }
+.modal h2 { font-size:1.3rem; font-weight:700; margin-bottom:6px; letter-spacing:-0.01em; }
+.modal h2 span { color:var(--accent); }
+.modal p { font-size:0.88rem; color:var(--text-muted); margin-bottom:22px; line-height:1.4; }
 .modal input {
-  width:100%; background:rgba(255,255,255,0.06);
-  border:1.5px solid var(--border); border-radius:10px;
-  padding:14px 16px; color:var(--white);
+  width:100%; background:var(--bg);
+  border:1.5px solid var(--border); border-radius:12px;
+  padding:14px 16px; color:var(--text);
   font-family:var(--font); font-size:1rem; outline:none;
-  transition:border-color 0.15s; margin-bottom:16px; -webkit-appearance:none;
+  transition:border-color 0.15s; margin-bottom:18px; -webkit-appearance:none;
 }
-.modal input:focus { border-color:var(--amber); }
-.modal input::placeholder { color:var(--muted); }
+.modal input:focus { border-color:var(--accent); }
+.modal input::placeholder { color:var(--text-muted); }
 .modal-btns { display:flex; gap:10px; }
 .btn-confirm {
-  flex:1; background:var(--amber); color:var(--navy); border:none;
-  border-radius:10px; padding:15px; font-family:var(--font);
-  font-size:1rem; font-weight:700; cursor:pointer;
+  flex:1; background:var(--accent); color:#fff; border:none;
+  border-radius:980px; padding:13px; font-family:var(--font);
+  font-size:1rem; font-weight:600; cursor:pointer;
   transition:transform 0.1s,opacity 0.1s; touch-action:manipulation;
 }
-.btn-confirm:active { transform:scale(0.97); opacity:0.9; }
+.btn-confirm:hover { opacity:0.9; }
+.btn-confirm:active { transform:scale(0.97); opacity:0.85; }
 .btn-confirm:disabled { opacity:0.5; cursor:not-allowed; }
 .btn-cancel {
-  background:rgba(255,255,255,0.06); color:var(--muted);
-  border:1.5px solid var(--border); border-radius:10px;
-  padding:15px 20px; font-family:var(--font); font-size:0.9rem;
+  background:transparent; color:var(--accent);
+  border:1.5px solid var(--border); border-radius:980px;
+  padding:13px 22px; font-family:var(--font); font-size:0.95rem; font-weight:600;
   cursor:pointer; touch-action:manipulation;
 }
+.btn-cancel:hover { background: rgba(0,0,0,0.03); }
 
 /* ── TOAST ────────────────────────────────────────────────── */
 #toast {
   position:fixed; bottom:32px; left:50%;
   transform:translateX(-50%) translateY(80px);
-  background:var(--green); color:var(--navy);
-  font-weight:700; font-size:0.9rem; padding:12px 24px;
-  border-radius:40px; z-index:300;
+  background:#1d1d1f; color:#fff;
+  font-weight:600; font-size:0.9rem; padding:12px 24px;
+  border-radius:980px; z-index:300;
   transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.35s;
   opacity:0; pointer-events:none; white-space:nowrap;
-  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  box-shadow:0 8px 24px rgba(0,0,0,0.2);
 }
 #toast.show   { transform:translateX(-50%) translateY(0); opacity:1; }
-#toast.error  { background:var(--red); color:var(--white); }
+#toast.error  { background:var(--red); color:#fff; }
+
+/* ── CONFETTI ─────────────────────────────────────────────── */
+#confetti-container { position:fixed; inset:0; pointer-events:none; z-index:400; overflow:hidden; }
+.confetti-piece {
+  position:absolute; top:-10px; left:0;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.3,0,0.7,1);
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
+}
+@keyframes confetti-fall {
+  0%   { transform: translate(0,0) rotate(0deg); opacity:1; }
+  100% { transform: translate(var(--drift), 100vh) rotate(var(--rot)); opacity:0.9; }
+}
 
 /* ── EMPTY ────────────────────────────────────────────────── */
-.empty { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; }
+.empty { text-align:center; padding:32px 20px; color:var(--text-muted); font-size:0.85rem; }
 
 /* ── SCROLLBAR ────────────────────────────────────────────── */
 ::-webkit-scrollbar { width:5px; height:5px; }
-::-webkit-scrollbar-track { background:var(--navy); }
-::-webkit-scrollbar-thumb { background:var(--navy-lite); border-radius:3px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 
 </style>
 </head>
@@ -394,7 +464,7 @@ tbody td { padding:10px 14px; color:var(--off-white); font-family:var(--mono); f
 
 <!-- STATUS BAR -->
 <div id="status-bar">
-  <span>🏥 HOSPITAL SNACK CART TRACKER</span>
+  <span>🏥 Hospital Snack Cart Tracker</span>
   <span class="sync-chip" id="sync-chip">
     <span class="sync-icon">↻</span>
     <span id="sync-label">connecting...</span>
@@ -421,7 +491,7 @@ tbody td { padding:10px 14px; color:var(--off-white); font-family:var(--mono); f
 
   <div id="setup-banner">
     <strong>Setup needed:</strong> this app isn't connected to a database yet.
-    Create a free <a href="https://supabase.com" target="_blank" style="color:var(--amber)">Supabase</a>
+    Create a free <a href="https://supabase.com" target="_blank" style="color:var(--accent)">Supabase</a>
     project, run <code>supabase/schema.sql</code> in its SQL editor, then put your
     Project URL and anon key into the <code>CONFIG</code> block near the top of this file's
     <code>&lt;script&gt;</code>. See <code>README.md</code> for the full walkthrough.
@@ -430,6 +500,19 @@ tbody td { padding:10px 14px; color:var(--off-white); font-family:var(--mono); f
   <div class="section-label">Report Cart Location</div>
   <div class="floor-grid" id="floor-grid"></div>
 
+  <div class="rewards-card">
+    <span class="rewards-badge-icon" id="rewards-badge-icon">🔍</span>
+    <div class="rewards-info">
+      <div class="rewards-title" id="rewards-title">—</div>
+      <div class="rewards-sub" id="rewards-sub">—</div>
+      <div class="rewards-progress-track"><div class="rewards-progress-fill" id="rewards-progress-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="cooldown-banner" id="cooldown-banner">
+    ⏱ You can report again in <strong id="cooldown-time">5:00</strong>
+  </div>
+
   <div class="section-label">Movement Timeline (24h)</div>
   <div class="timeline">
     <ul class="timeline-list" id="timeline-list">
@@ -437,14 +520,15 @@ tbody td { padding:10px 14px; color:var(--off-white); font-family:var(--mono); f
     </ul>
   </div>
 
-  <div class="section-label">All Entries (Last 24h)</div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Time</th><th>Floor</th><th>Reported By</th></tr></thead>
-      <tbody id="data-table-body">
-        <tr><td colspan="3" class="empty">Loading...</td></tr>
-      </tbody>
-    </table>
+  <div class="section-label">Comments</div>
+  <div class="comments">
+    <div class="comment-composer">
+      <input type="text" id="comment-input" placeholder="Say something..." maxlength="500" autocomplete="off" />
+      <button id="comment-post">Post</button>
+    </div>
+    <div class="comment-list" id="comment-list">
+      <div class="empty">Loading comments...</div>
+    </div>
   </div>
 
   <div class="section-label">Floor Activity Heatmap (24h)</div>
@@ -482,6 +566,9 @@ tbody td { padding:10px 14px; color:var(--off-white); font-family:var(--mono); f
 <!-- TOAST -->
 <div id="toast"></div>
 
+<!-- CONFETTI -->
+<div id="confetti-container"></div>
+
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -499,20 +586,35 @@ const CONFIG = {
 };
 
 const FLOOR_COLORS = [
-  '#6366F1','#8B5CF6','#EC4899','#EF4444','#F59E0B',
-  '#10B981','#0EA5E9','#3B82F6','#14B8A6','#F97316'
+  '#5e5ce6','#af52de','#ff375f','#ff3b30','#ff9500',
+  '#30d158','#0071e3','#007aff','#00c7be','#ff9f0a'
 ];
 
 const IS_CONFIGURED = !CONFIG.SUPABASE_URL.startsWith('YOUR_') && !CONFIG.SUPABASE_ANON_KEY.startsWith('YOUR_');
 const supabase = IS_CONFIGURED ? createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
 
+const BADGES = [
+  { points: 1,  icon: '🔍', name: 'First Sighting' },
+  { points: 5,  icon: '🎖', name: 'Regular Reporter' },
+  { points: 15, icon: '🕵', name: 'Cart Detective' },
+  { points: 30, icon: '🛡', name: 'Snack Sentinel' },
+  { points: 60, icon: '👑', name: 'Cart Legend' }
+];
+const COOLDOWN_MS = 5 * 60 * 1000;
+const REACTION_EMOJI = ['👍','❤️','😂','😮','🎉'];
+
 const IDENTITY_KEY = 'cart_identity';
-let identityName  = localStorage.getItem(IDENTITY_KEY) || '';
-let entries       = new Map();   // id -> {id, created_at, floor, reporter_name}
-let pendingFloor  = null;
-let refreshTimer  = null;
-let timeAgoTimer  = null;
-let toastTimer    = null;
+let identityName   = localStorage.getItem(IDENTITY_KEY) || '';
+let entries        = new Map();   // id -> {id, created_at, floor, reporter_name}
+let comments       = new Map();   // id -> {id, created_at, author_name, body}
+let reactions      = new Map();   // id -> {id, comment_id, emoji, author_name}
+let myPoints        = 0;
+let myLastReportAt  = null;
+let pendingFloor    = null;
+let refreshTimer    = null;
+let timeAgoTimer    = null;
+let cooldownTimer   = null;
+let toastTimer      = null;
 
 /* ── INIT ─────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
@@ -524,7 +626,10 @@ document.addEventListener('DOMContentLoaded', () => {
   buildHeatmapRows();
   setupIdentityModal();
   setupConfirmModal();
+  setupComments();
   renderIdentityChip();
+  renderRewards();
+  startCooldownTicker();
 
   if (!identityName) {
     openIdentityModal();
@@ -532,6 +637,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (IS_CONFIGURED) {
     loadData();
+    loadMyStats();
+    loadComments();
     subscribeRealtime();
     startLoops();
   }
@@ -549,6 +656,8 @@ function setupIdentityModal() {
     localStorage.setItem(IDENTITY_KEY, identityName);
     renderIdentityChip();
     overlay.classList.remove('open');
+    if (IS_CONFIGURED) loadMyStats();
+    renderComments();
   };
   confirm.addEventListener('click', submit);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
@@ -583,15 +692,17 @@ function buildFloorButtons() {
 
 function buildHeatmapRows() {
   const grid = document.getElementById('heatmap-grid');
-  for (let i = 1; i <= CONFIG.NUM_FLOORS; i++) {
+  for (let i = CONFIG.NUM_FLOORS; i >= 1; i--) {
     const label = CONFIG.FLOOR_LABELS[i-1] || `Floor ${i}`;
     const row = document.createElement('div');
     row.className = 'hm-row';
+    row.id = `hm-row-${i}`;
     row.innerHTML = `
       <span class="hm-label">${label}</span>
       <div class="hm-bar-wrap">
         <div class="hm-bar" id="hm-bar-${i}" data-count=""
              style="width:0%;background:${FLOOR_COLORS[i-1]};"></div>
+        <span class="hm-current-badge" id="hm-current-${i}">🛒 Last seen here</span>
       </div>
       <span class="hm-count" id="hm-count-${i}">0</span>`;
     grid.appendChild(row);
@@ -607,6 +718,10 @@ function setupConfirmModal() {
 }
 
 function openConfirmModal(floor, label) {
+  if (cooldownRemainingMs() > 0) {
+    showToast('⏱ Still on cooldown — wait for the timer', true);
+    return;
+  }
   pendingFloor = floor;
   document.getElementById('modal-floor').textContent = label;
   document.getElementById('modal-sub').textContent =
@@ -637,7 +752,6 @@ async function submitSighting(floor) {
     reporter_name: identityName
   });
   renderAll();
-  showToast(`✓ Floor ${floor} reported!`, false);
 
   const { data, error } = await supabase
     .from('sightings')
@@ -648,9 +762,22 @@ async function submitSighting(floor) {
   entries.delete(tempId);
   if (error) {
     console.error('Insert failed:', error);
-    showToast('⚠ Failed to save — try again', true);
+    const onCooldown = /row-level security/i.test(error.message || '');
+    showToast(onCooldown ? '⏱ Still on cooldown — try again shortly' : '⚠ Failed to save — try again', true);
   } else {
     entries.set(data.id, data);
+    fireConfetti();
+    const { current: before } = computeBadge(myPoints);
+    myPoints += 1;
+    myLastReportAt = data.created_at;
+    const { current: after } = computeBadge(myPoints);
+    renderRewards();
+    updateCooldownUI();
+    if (after && after !== before) {
+      showToast(`🎉 New badge: ${after.icon} ${after.name}!`, false);
+    } else {
+      showToast(`✓ Floor ${floor} reported! +1 pt`, false);
+    }
   }
   renderAll();
   setSyncState('ok');
@@ -676,13 +803,74 @@ async function loadData() {
   setSyncState('ok');
 }
 
+async function loadMyStats() {
+  if (!identityName) {
+    myPoints = 0;
+    myLastReportAt = null;
+    renderRewards();
+    updateCooldownUI();
+    return;
+  }
+  const { count } = await supabase
+    .from('sightings')
+    .select('*', { count: 'exact', head: true })
+    .eq('reporter_name', identityName);
+  myPoints = count || 0;
+
+  const { data } = await supabase
+    .from('sightings')
+    .select('created_at')
+    .eq('reporter_name', identityName)
+    .order('created_at', { ascending: false })
+    .limit(1);
+  myLastReportAt = data && data.length ? data[0].created_at : null;
+
+  renderRewards();
+  updateCooldownUI();
+}
+
+async function loadComments() {
+  const { data: commentRows, error } = await supabase
+    .from('comments')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (error) { console.error('Comments load failed:', error); return; }
+  comments = new Map(commentRows.map(c => [c.id, c]));
+
+  const { data: reactionRows, error: rxError } = await supabase
+    .from('comment_reactions')
+    .select('*');
+  if (!rxError) reactions = new Map(reactionRows.map(r => [r.id, r]));
+
+  renderComments();
+}
+
 /* ── SUPABASE: REALTIME ───────────────────────────────────── */
 function subscribeRealtime() {
   supabase
     .channel('sightings-changes')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sightings' }, payload => {
       entries.set(payload.new.id, payload.new);
+      if (identityName && payload.new.reporter_name === identityName && payload.new.created_at !== myLastReportAt) {
+        myPoints += 1;
+        myLastReportAt = payload.new.created_at;
+        renderRewards();
+        updateCooldownUI();
+      }
       renderAll();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, payload => {
+      comments.set(payload.new.id, payload.new);
+      renderComments();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comment_reactions' }, payload => {
+      reactions.set(payload.new.id, payload.new);
+      renderComments();
+    })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'comment_reactions' }, payload => {
+      reactions.delete(payload.old.id);
+      renderComments();
     })
     .subscribe(status => {
       if (status === 'SUBSCRIBED') setSyncState('ok', 'live');
@@ -702,7 +890,6 @@ function renderAll() {
   renderBanner(list);
   renderButtons(list);
   renderTimeline(list);
-  renderTable(list);
   renderHeatmap(list);
 }
 
@@ -711,7 +898,7 @@ function renderBanner(list) {
   const timeAgoEl = document.getElementById('time-ago');
   if (!list.length) {
     labelEl.textContent  = '—';
-    labelEl.style.color  = 'var(--amber)';
+    labelEl.style.color  = 'var(--accent)';
     timeAgoEl.textContent = 'No updates yet';
     return;
   }
@@ -764,39 +951,183 @@ function renderTimeline(list) {
   });
 }
 
-function renderTable(list) {
-  const tbody = document.getElementById('data-table-body');
-  tbody.innerHTML = '';
-  if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="3" class="empty">No entries yet.</td></tr>';
-    return;
-  }
-  [...list].reverse().forEach(e => {
-    const color = FLOOR_COLORS[(e.floor-1) % FLOOR_COLORS.length];
-    const label = CONFIG.FLOOR_LABELS[e.floor-1] || `Floor ${e.floor}`;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${fmtDateTime(new Date(e.created_at))}</td>
-      <td><span class="badge-floor" style="color:${color};border-color:${color}30">${label}</span></td>
-      <td style="color:var(--muted)">${escapeHtml(e.reporter_name) || '—'}</td>`;
-    tbody.appendChild(tr);
-  });
-}
 
 function renderHeatmap(list) {
   const counts = {};
   for (let i=1; i<=CONFIG.NUM_FLOORS; i++) counts[i] = 0;
   list.forEach(e => { if (counts[e.floor] !== undefined) counts[e.floor]++; });
   const max = Math.max(1, ...Object.values(counts));
+  const currentFloor = list.length ? list[list.length-1].floor : null;
+
   for (let i=1; i<=CONFIG.NUM_FLOORS; i++) {
+    const row   = document.getElementById(`hm-row-${i}`);
     const bar   = document.getElementById(`hm-bar-${i}`);
     const count = document.getElementById(`hm-count-${i}`);
-    if (!bar || !count) continue;
+    const badge = document.getElementById(`hm-current-${i}`);
+    if (!row || !bar || !count || !badge) continue;
     const pct = counts[i] / max * 100;
     bar.style.width   = pct>0 ? Math.max(pct,3)+'%' : '0%';
-    bar.style.opacity = 0.3 + 0.7*(counts[i]/max);
+    bar.style.opacity = 0.18 + 0.35*(counts[i]/max);
     bar.dataset.count = counts[i]>0 ? counts[i] : '';
+    row.classList.toggle('is-current', i === currentFloor);
+    badge.classList.toggle('show', i === currentFloor);
     count.textContent = counts[i];
+  }
+}
+
+/* ── REWARDS ──────────────────────────────────────────────── */
+function computeBadge(points) {
+  let current = null;
+  for (const b of BADGES) if (points >= b.points) current = b;
+  const next = BADGES.find(b => b.points > points) || null;
+  return { current, next };
+}
+
+function renderRewards() {
+  const { current, next } = computeBadge(myPoints);
+  document.getElementById('rewards-badge-icon').textContent = current ? current.icon : '🎯';
+  document.getElementById('rewards-title').textContent = current ? current.name : 'No badge yet';
+
+  const fillEl = document.getElementById('rewards-progress-fill');
+  const subEl  = document.getElementById('rewards-sub');
+  if (next) {
+    const prevThreshold = current ? current.points : 0;
+    const pct = Math.max(0, Math.min(100, (myPoints - prevThreshold) / (next.points - prevThreshold) * 100));
+    fillEl.style.width = pct + '%';
+    subEl.textContent = `${myPoints} pt${myPoints===1?'':'s'} · ${next.points - myPoints} more to ${next.icon} ${next.name}`;
+  } else {
+    fillEl.style.width = '100%';
+    subEl.textContent = `${myPoints} pts · Max badge reached!`;
+  }
+}
+
+function cooldownRemainingMs() {
+  if (!myLastReportAt) return 0;
+  const remaining = COOLDOWN_MS - (Date.now() - new Date(myLastReportAt).getTime());
+  return remaining > 0 ? remaining : 0;
+}
+
+function updateCooldownUI() {
+  const remaining = cooldownRemainingMs();
+  const onCooldown = remaining > 0;
+  document.getElementById('cooldown-banner').classList.toggle('show', onCooldown);
+  document.querySelectorAll('.floor-btn').forEach(btn => {
+    btn.disabled = !IS_CONFIGURED || onCooldown;
+  });
+  if (onCooldown) {
+    const totalSec = Math.ceil(remaining / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    document.getElementById('cooldown-time').textContent = `${m}:${String(s).padStart(2,'0')}`;
+  }
+}
+
+function startCooldownTicker() {
+  clearInterval(cooldownTimer);
+  cooldownTimer = setInterval(updateCooldownUI, 1000);
+}
+
+/* ── COMMENTS ─────────────────────────────────────────────── */
+function setupComments() {
+  const input = document.getElementById('comment-input');
+  const btn   = document.getElementById('comment-post');
+  if (!IS_CONFIGURED) { input.disabled = true; btn.disabled = true; }
+  btn.addEventListener('click', postComment);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') postComment(); });
+}
+
+async function postComment() {
+  const input = document.getElementById('comment-input');
+  const body  = input.value.trim();
+  if (!body) return;
+  const btn = document.getElementById('comment-post');
+  btn.disabled = true;
+
+  const tempId = `temp-${Date.now()}`;
+  comments.set(tempId, { id: tempId, created_at: new Date().toISOString(), author_name: identityName, body });
+  input.value = '';
+  renderComments();
+
+  const { data, error } = await supabase
+    .from('comments')
+    .insert({ author_name: identityName, body })
+    .select()
+    .single();
+
+  comments.delete(tempId);
+  if (error) {
+    console.error('Comment failed:', error);
+    showToast('⚠ Comment failed to post', true);
+  } else {
+    comments.set(data.id, data);
+  }
+  renderComments();
+  btn.disabled = false;
+}
+
+function commentsSorted() {
+  return [...comments.values()].sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
+}
+
+function reactionsFor(commentId) {
+  return [...reactions.values()].filter(r => r.comment_id === commentId);
+}
+
+function renderComments() {
+  const el = document.getElementById('comment-list');
+  const list = commentsSorted();
+  if (!list.length) {
+    el.innerHTML = '<div class="empty">No comments yet — say something!</div>';
+    return;
+  }
+  el.innerHTML = list.map(c => {
+    const rx = reactionsFor(c.id);
+    const counts = {};
+    rx.forEach(r => { counts[r.emoji] = (counts[r.emoji] || 0) + 1; });
+    const pills = REACTION_EMOJI.map(emoji => {
+      const count = counts[emoji] || 0;
+      const mine = rx.some(r => r.emoji === emoji && r.author_name === identityName);
+      return `<span class="reaction-pill ${mine ? 'mine' : ''}" data-comment="${c.id}" data-emoji="${emoji}">${emoji}${count ? ` <span class="count">${count}</span>` : ''}</span>`;
+    }).join('');
+    return `
+      <div class="comment-card">
+        <div class="comment-head">
+          <span class="comment-author">${escapeHtml(c.author_name) || 'Anonymous'}</span>
+          <span class="comment-time">${timeAgo(new Date(c.created_at))}</span>
+        </div>
+        <div class="comment-body">${escapeHtml(c.body)}</div>
+        <div class="reaction-row">${pills}</div>
+      </div>`;
+  }).join('');
+
+  el.querySelectorAll('.reaction-pill').forEach(pill => {
+    pill.addEventListener('click', () => toggleReaction(Number(pill.dataset.comment), pill.dataset.emoji));
+  });
+}
+
+async function toggleReaction(commentId, emoji) {
+  if (!identityName) { openIdentityModal(); return; }
+  const existing = [...reactions.values()]
+    .find(r => r.comment_id === commentId && r.emoji === emoji && r.author_name === identityName);
+
+  if (existing) {
+    reactions.delete(existing.id);
+    renderComments();
+    const { error } = await supabase.from('comment_reactions').delete().eq('id', existing.id);
+    if (error) { console.error('Un-react failed:', error); loadComments(); }
+  } else {
+    const tempId = `temp-${Date.now()}`;
+    reactions.set(tempId, { id: tempId, comment_id: commentId, emoji, author_name: identityName });
+    renderComments();
+    const { data, error } = await supabase
+      .from('comment_reactions')
+      .insert({ comment_id: commentId, emoji, author_name: identityName })
+      .select()
+      .single();
+    reactions.delete(tempId);
+    if (error) { console.error('React failed:', error); loadComments(); return; }
+    reactions.set(data.id, data);
+    renderComments();
   }
 }
 
@@ -804,7 +1135,7 @@ function renderHeatmap(list) {
 function startLoops() {
   clearInterval(refreshTimer);
   clearInterval(timeAgoTimer);
-  refreshTimer = setInterval(loadData, CONFIG.REFRESH_MS);
+  refreshTimer = setInterval(() => { loadData(); loadMyStats(); }, CONFIG.REFRESH_MS);
   timeAgoTimer = setInterval(() => {
     const list = sortedEntries();
     if (!list.length) return;
@@ -841,6 +1172,29 @@ function showToast(msg, isError) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
+/* ── CONFETTI ─────────────────────────────────────────────── */
+function fireConfetti() {
+  const container = document.getElementById('confetti-container');
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const duration = 1.6 + Math.random() * 1.4;
+    const delay    = Math.random() * 0.3;
+    const size     = 6 + Math.random() * 6;
+    el.style.left               = Math.random() * 100 + 'vw';
+    el.style.width              = size + 'px';
+    el.style.height             = (size * (Math.random() > 0.5 ? 1 : 1.6)) + 'px';
+    el.style.background         = FLOOR_COLORS[Math.floor(Math.random() * FLOOR_COLORS.length)];
+    el.style.borderRadius       = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.animationDuration  = duration + 's';
+    el.style.animationDelay     = delay + 's';
+    el.style.setProperty('--drift', (Math.random() * 160 - 80) + 'px');
+    el.style.setProperty('--rot', (360 + Math.random() * 720) + 'deg');
+    container.appendChild(el);
+    setTimeout(() => el.remove(), (duration + delay) * 1000 + 50);
+  }
+}
+
 /* ── HELPERS ──────────────────────────────────────────────── */
 function escapeHtml(str) {
   if (!str) return '';
@@ -848,9 +1202,6 @@ function escapeHtml(str) {
 }
 function fmtTime(d) {
   return d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-}
-function fmtDateTime(d) {
-  return d.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 function durStr(a, b) {
   const m = Math.round((b-a)/60000);

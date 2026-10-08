@@ -8,9 +8,12 @@ name once and the browser remembers it.
 
 1. Go to https://supabase.com, sign in, and click **New project**.
 2. Once it's created, open **SQL Editor** and run the contents of
-   [`supabase/schema.sql`](supabase/schema.sql).
+   [`supabase/schema.sql`](supabase/schema.sql), then
+   [`supabase/migration_rewards_comments.sql`](supabase/migration_rewards_comments.sql)
+   (adds the 5-minute reporting cooldown, comments, and reactions).
 3. Open **Database → Replication** and turn on the **Realtime** toggle for
-   the `sightings` table (so updates push live instead of waiting on a poll).
+   the `sightings`, `comments`, and `comment_reactions` tables (so updates
+   push live instead of waiting on a poll).
 4. Open **Project Settings → API** and copy:
    - **Project URL**
    - **anon public** key (NOT the `service_role` key — that one must stay secret)
@@ -61,6 +64,15 @@ branch (`/` root), save, and your app will be live at
   Tap the chip in the header any time to change it.
 - **Data**: floor reports are written to a `sightings` table in Supabase and
   broadcast to every open tab/device via Supabase Realtime.
+- **Rewards**: each report earns 1 point (counted directly from your past
+  `sightings` rows — no separate score to get out of sync) and unlocks
+  badges at 1 / 5 / 15 / 30 / 60 points (see the `BADGES` constant in
+  `index.html` to change the tiers). After reporting, there's a 5-minute
+  cooldown before you can report again — enforced both in the UI and by a
+  database policy, so it can't be bypassed by refreshing the page.
+- **Comments & reactions**: an open comment thread under the timeline, with
+  five emoji reactions per comment. Anyone can post or react using the same
+  name-only identity as reporting.
 - **Everything is static**: `index.html` is the whole app. No server to run,
   no build step — just open the file or host it anywhere that serves static
   files.
