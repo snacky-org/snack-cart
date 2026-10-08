@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Snack Cart Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ── VARIABLES ────────────────────────────────────────────── */
+:root {
+  --navy:      #0A1628;
+  --navy-mid:  #112240;
+  --navy-lite: #1C3461;
+  --amber:     #F59E0B;
+  --green:     #10B981;
+  --red:       #EF4444;
+  --white:     #FFFFFF;
+  --off-white: #F0F4FF;
+  --muted:     #8899BB;
+  --border:    rgba(255,255,255,0.08);
+  --card-bg:   rgba(17,34,64,0.7);
+  --f1:#6366F1; --f2:#8B5CF6; --f3:#EC4899; --f4:#EF4444; --f5:#F59E0B;
+  --f6:#10B981; --f7:#0EA5E9; --f8:#3B82F6; --f9:#14B8A6; --f10:#F97316;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --radius: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* ── RESET ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font);
+  background: var(--navy);
+  color: var(--white);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background-image:
+    linear-gradient(rgba(14,165,233,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,165,233,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── STATUS BAR ───────────────────────────────────────────── */
+#status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  font-family: var(--mono);
+  color: var(--muted);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--navy);
+  letter-spacing: 0.05em;
+}
+.sync-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+.sync-icon { display: inline-block; }
+.sync-chip.syncing .sync-icon { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── STICKY HEADER ────────────────────────────────────────── */
+#header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--navy-mid);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 16px 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+.header-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.cart-icon {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(245,158,11,0.5));
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+.banner-text { flex: 1; min-width: 0; }
+.banner-text h1 {
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+#current-floor-label {
+  color: var(--amber);
+  font-size: clamp(1.1rem, 5vw, 1.5rem);
+}
+.banner-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 3px;
+  font-family: var(--mono);
+}
+.live-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(0.8); }
+}
+.identity-chip {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-family: var(--mono);
+  color: var(--muted);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.identity-chip:hover { border-color: var(--amber); color: var(--off-white); }
+.identity-chip span { color: var(--amber); font-weight: 600; }
+
+/* ── MAIN ─────────────────────────────────────────────────── */
+main {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+/* ── SETUP BANNER ─────────────────────────────────────────── */
+#setup-banner {
+  display: none;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+#setup-banner.show { display: block; }
+#setup-banner code {
+  font-family: var(--mono);
+  background: rgba(255,255,255,0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+/* ── SECTION LABELS ───────────────────────────────────────── */
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+  padding-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── FLOOR BUTTONS ────────────────────────────────────────── */
+.floor-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 32px;
+}
+@media (max-width: 420px) {
+  .floor-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.floor-btn {
+  --accent: #0EA5E9;
+  position: relative;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 8px;
+  cursor: pointer;
+  color: var(--white);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+  text-align: center;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 72px;
+}
+.floor-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.floor-btn::before {
+  content:'';
+  position:absolute; inset:0;
+  background: var(--accent);
+  opacity:0;
+  transition: opacity 0.15s;
+  border-radius: calc(var(--radius) - 1px);
+}
+.floor-btn:hover  { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.4); border-color:var(--accent); }
+.floor-btn:active { transform:scale(0.96); }
+.floor-btn:hover::before { opacity:0.12; }
+.floor-btn .floor-num {
+  display:block; font-size:1.4rem; font-weight:700;
+  line-height:1; margin-bottom:2px; color:var(--accent);
+}
+.floor-btn.is-current {
+  border-color: var(--accent);
+  background: rgba(255,255,255,0.06);
+  box-shadow: 0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent), var(--shadow);
+}
+.floor-btn.is-current::after {
+  content:'●'; position:absolute; top:5px; right:8px;
+  font-size:0.5rem; color:var(--accent); animation:pulse 2s infinite;
+}
+.floor-btn[data-floor="1"]  { --accent:var(--f1); }
+.floor-btn[data-floor="2"]  { --accent:var(--f2); }
+.floor-btn[data-floor="3"]  { --accent:var(--f3); }
+.floor-btn[data-floor="4"]  { --accent:var(--f4); }
+.floor-btn[data-floor="5"]  { --accent:var(--f5); }
+.floor-btn[data-floor="6"]  { --accent:var(--f6); }
+.floor-btn[data-floor="7"]  { --accent:var(--f7); }
+.floor-btn[data-floor="8"]  { --accent:var(--f8); }
+.floor-btn[data-floor="9"]  { --accent:var(--f9); }
+.floor-btn[data-floor="10"] { --accent:var(--f10); }
+
+/* ── TIMELINE ─────────────────────────────────────────────── */
+.timeline { margin-bottom: 32px; }
+.timeline-list { list-style:none; position:relative; padding-left:28px; }
+.timeline-list::before {
+  content:''; position:absolute; left:8px; top:8px; bottom:8px;
+  width:2px; background:linear-gradient(to bottom,var(--amber),#0EA5E9); border-radius:2px;
+}
+.tl-item { position:relative; margin-bottom:14px; animation:slideIn 0.3s ease both; }
+@keyframes slideIn {
+  from { opacity:0; transform:translateX(-8px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+.tl-item::before {
+  content:''; position:absolute; left:-24px; top:10px;
+  width:10px; height:10px; background:var(--accent,#0EA5E9);
+  border-radius:50%; border:2px solid var(--navy); z-index:1;
+}
+.tl-item.tl-current::before {
+  background:var(--amber);
+  box-shadow:0 0 0 4px rgba(245,158,11,0.25);
+  animation:pulse 2s infinite;
+}
+.tl-card {
+  background:var(--card-bg); border:1px solid var(--border);
+  border-radius:10px; padding:10px 14px;
+  display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.tl-floor { font-weight:700; font-size:0.95rem; color:var(--accent,#0EA5E9); }
+.tl-floor.is-now { color:var(--amber); }
+.tl-who { font-size:0.7rem; color:var(--muted); font-family:var(--mono); }
+.tl-time { font-size:0.72rem; font-family:var(--mono); color:var(--muted); text-align:right; }
+.tl-badge-now {
+  background:var(--amber); color:var(--navy);
+  font-size:0.62rem; font-weight:700; letter-spacing:0.08em;
+  padding:2px 7px; border-radius:20px; text-transform:uppercase;
+}
+
+/* ── TABLE ────────────────────────────────────────────────── */
+.table-wrap {
+  overflow-x:auto; border-radius:var(--radius);
+  border:1px solid var(--border); margin-bottom:32px;
+  -webkit-overflow-scrolling:touch;
+}
+table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+thead th {
+  background:var(--navy-lite); padding:10px 14px; text-align:left;
+  font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--muted); font-weight:600; white-space:nowrap;
+}
+tbody tr { border-top:1px solid var(--border); transition:background 0.1s; }
+tbody tr:hover { background:rgba(255,255,255,0.03); }
+tbody td { padding:10px 14px; color:var(--off-white); font-family:var(--mono); font-size:0.78rem; white-space:nowrap; }
+.badge-floor {
+  display:inline-block; padding:2px 9px; border-radius:20px;
+  font-weight:700; font-size:0.75rem; background:rgba(255,255,255,0.07); border:1px solid transparent;
+}
+
+/* ── HEATMAP ──────────────────────────────────────────────── */
+.heatmap { margin-bottom:32px; }
+.heatmap-grid { display:flex; flex-direction:column; gap:6px; }
+.hm-row { display:flex; align-items:center; gap:10px; }
+.hm-label { font-size:0.75rem; font-family:var(--mono); color:var(--muted); width:56px; flex-shrink:0; text-align:right; }
+.hm-bar-wrap { flex:1; height:22px; background:rgba(255,255,255,0.04); border-radius:6px; overflow:hidden; }
+.hm-bar { height:100%; border-radius:6px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1); position:relative; }
+.hm-bar::after {
+  content:attr(data-count); position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  font-size:0.65rem; font-family:var(--mono); color:rgba(255,255,255,0.7); font-weight:600;
+}
+.hm-count { font-size:0.7rem; font-family:var(--mono); color:var(--muted); width:24px; text-align:right; flex-shrink:0; }
+
+/* ── MODAL ────────────────────────────────────────────────── */
+.modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  z-index:200; align-items:flex-end; justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--navy-mid); border:1px solid var(--border);
+  border-radius:24px 24px 0 0; padding:28px 24px 48px;
+  width:100%; max-width:500px;
+  animation:slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideUp {
+  from { transform:translateY(100%); opacity:0; }
+  to   { transform:translateY(0); opacity:1; }
+}
+.modal h2 { font-size:1.2rem; font-weight:700; margin-bottom:4px; }
+.modal h2 span { color:var(--amber); }
+.modal p { font-size:0.82rem; color:var(--muted); margin-bottom:20px; }
+.modal input {
+  width:100%; background:rgba(255,255,255,0.06);
+  border:1.5px solid var(--border); border-radius:10px;
+  padding:14px 16px; color:var(--white);
+  font-family:var(--font); font-size:1rem; outline:none;
+  transition:border-color 0.15s; margin-bottom:16px; -webkit-appearance:none;
+}
+.modal input:focus { border-color:var(--amber); }
+.modal input::placeholder { color:var(--muted); }
+.modal-btns { display:flex; gap:10px; }
+.btn-confirm {
+  flex:1; background:var(--amber); color:var(--navy); border:none;
+  border-radius:10px; padding:15px; font-family:var(--font);
+  font-size:1rem; font-weight:700; cursor:pointer;
+  transition:transform 0.1s,opacity 0.1s; touch-action:manipulation;
+}
+.btn-confirm:active { transform:scale(0.97); opacity:0.9; }
+.btn-confirm:disabled { opacity:0.5; cursor:not-allowed; }
+.btn-cancel {
+  background:rgba(255,255,255,0.06); color:var(--muted);
+  border:1.5px solid var(--border); border-radius:10px;
+  padding:15px 20px; font-family:var(--font); font-size:0.9rem;
+  cursor:pointer; touch-action:manipulation;
+}
+
+/* ── TOAST ────────────────────────────────────────────────── */
+#toast {
+  position:fixed; bottom:32px; left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--green); color:var(--navy);
+  font-weight:700; font-size:0.9rem; padding:12px 24px;
+  border-radius:40px; z-index:300;
+  transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.35s;
+  opacity:0; pointer-events:none; white-space:nowrap;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+#toast.show   { transform:translateX(-50%) translateY(0); opacity:1; }
+#toast.error  { background:var(--red); color:var(--white); }
+
+/* ── EMPTY ────────────────────────────────────────────────── */
+.empty { text-align:center; padding:32px 20px; color:var(--muted); font-size:0.85rem; }
+
+/* ── SCROLLBAR ────────────────────────────────────────────── */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:var(--navy); }
+::-webkit-scrollbar-thumb { background:var(--navy-lite); border-radius:3px; }
+
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div id="status-bar">
+  <span>🏥 HOSPITAL SNACK CART TRACKER</span>
+  <span class="sync-chip" id="sync-chip">
+    <span class="sync-icon">↻</span>
+    <span id="sync-label">connecting...</span>
+  </span>
+</div>
+
+<!-- STICKY HEADER -->
+<div id="header">
+  <div class="header-inner">
+    <span class="cart-icon">🛒</span>
+    <div class="banner-text">
+      <h1>Snack Cart is on <span id="current-floor-label">—</span></h1>
+      <div class="banner-sub">
+        <span class="live-dot"></span>
+        <span id="time-ago">Loading...</span>
+      </div>
+    </div>
+    <div class="identity-chip" id="identity-chip">Hi, <span id="identity-name">—</span></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <div id="setup-banner">
+    <strong>Setup needed:</strong> this app isn't connected to a database yet.
+    Create a free <a href="https://supabase.com" target="_blank" style="color:var(--amber)">Supabase</a>
+    project, run <code>supabase/schema.sql</code> in its SQL editor, then put your
+    Project URL and anon key into the <code>CONFIG</code> block near the top of this file's
+    <code>&lt;script&gt;</code>. See <code>README.md</code> for the full walkthrough.
+  </div>
+
+  <div class="section-label">Report Cart Location</div>
+  <div class="floor-grid" id="floor-grid"></div>
+
+  <div class="section-label">Movement Timeline (24h)</div>
+  <div class="timeline">
+    <ul class="timeline-list" id="timeline-list">
+      <li class="empty">Loading data...</li>
+    </ul>
+  </div>
+
+  <div class="section-label">All Entries (Last 24h)</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Time</th><th>Floor</th><th>Reported By</th></tr></thead>
+      <tbody id="data-table-body">
+        <tr><td colspan="3" class="empty">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-label">Floor Activity Heatmap (24h)</div>
+  <div class="heatmap">
+    <div class="heatmap-grid" id="heatmap-grid"></div>
+  </div>
+
+</main>
+
+<!-- IDENTITY MODAL (one-time "log in") -->
+<div class="modal-overlay" id="identity-overlay">
+  <div class="modal">
+    <h2>Welcome <span>👋</span></h2>
+    <p>What's your name? We'll remember it on this device so you don't have to type it again.</p>
+    <input type="text" id="identity-input" placeholder="Your name"
+           maxlength="40" autocomplete="off" autocorrect="off" autocapitalize="words" />
+    <div class="modal-btns">
+      <button class="btn-confirm" id="identity-confirm" style="flex:1">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h2>Cart spotted on <span id="modal-floor">Floor X</span>? 🎉</h2>
+    <p id="modal-sub">Reporting as you — tap confirm to update everyone.</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="btn-cancel">Cancel</button>
+      <button class="btn-confirm" id="btn-confirm">Confirm Update ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+/* ================================================================
+   CONFIG — fill these in from your Supabase project
+   (Dashboard -> Project Settings -> API)
+   ================================================================ */
+const CONFIG = {
+  SUPABASE_URL:      'https://vkckgbvkddxpfofybopa.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrY2tnYnZrZGR4cGZvZnlib3BhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NzUyOTksImV4cCI6MjEwNzA1MTI5OX0.LMRJAgym6JVXwurStRDxLWVCF55r9o0zin4q6CJEmfU',
+  NUM_FLOORS:        10,
+  REFRESH_MS:        60000,   // fallback poll, in case realtime drops
+  HOURS_WINDOW:      24,
+  FLOOR_LABELS:      []       // e.g. ['ER','ICU','OR',...] — leave empty for "Floor 1" etc.
+};
+
+const FLOOR_COLORS = [
+  '#6366F1','#8B5CF6','#EC4899','#EF4444','#F59E0B',
+  '#10B981','#0EA5E9','#3B82F6','#14B8A6','#F97316'
+];
+
+const IS_CONFIGURED = !CONFIG.SUPABASE_URL.startsWith('YOUR_') && !CONFIG.SUPABASE_ANON_KEY.startsWith('YOUR_');
+const supabase = IS_CONFIGURED ? createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY) : null;
+
+const IDENTITY_KEY = 'cart_identity';
+let identityName  = localStorage.getItem(IDENTITY_KEY) || '';
+let entries       = new Map();   // id -> {id, created_at, floor, reporter_name}
+let pendingFloor  = null;
+let refreshTimer  = null;
+let timeAgoTimer  = null;
+let toastTimer    = null;
+
+/* ── INIT ─────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!IS_CONFIGURED) {
+    document.getElementById('setup-banner').classList.add('show');
+    setSyncState('error', 'not configured');
+  }
+  buildFloorButtons();
+  buildHeatmapRows();
+  setupIdentityModal();
+  setupConfirmModal();
+  renderIdentityChip();
+
+  if (!identityName) {
+    openIdentityModal();
+  }
+
+  if (IS_CONFIGURED) {
+    loadData();
+    subscribeRealtime();
+    startLoops();
+  }
+});
+
+/* ── IDENTITY ("log in") ──────────────────────────────────── */
+function setupIdentityModal() {
+  const overlay = document.getElementById('identity-overlay');
+  const input   = document.getElementById('identity-input');
+  const confirm = document.getElementById('identity-confirm');
+  const submit  = () => {
+    const val = input.value.trim();
+    if (!val) { input.focus(); return; }
+    identityName = val;
+    localStorage.setItem(IDENTITY_KEY, identityName);
+    renderIdentityChip();
+    overlay.classList.remove('open');
+  };
+  confirm.addEventListener('click', submit);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+  document.getElementById('identity-chip').addEventListener('click', openIdentityModal);
+}
+
+function openIdentityModal() {
+  const overlay = document.getElementById('identity-overlay');
+  document.getElementById('identity-input').value = identityName;
+  overlay.classList.add('open');
+  setTimeout(() => document.getElementById('identity-input').focus(), 300);
+}
+
+function renderIdentityChip() {
+  document.getElementById('identity-name').textContent = identityName || 'switch user';
+}
+
+/* ── BUILD UI ─────────────────────────────────────────────── */
+function buildFloorButtons() {
+  const grid = document.getElementById('floor-grid');
+  for (let i = 1; i <= CONFIG.NUM_FLOORS; i++) {
+    const label = CONFIG.FLOOR_LABELS[i-1] || `Floor ${i}`;
+    const btn = document.createElement('button');
+    btn.className = 'floor-btn';
+    btn.dataset.floor = i;
+    btn.disabled = !IS_CONFIGURED;
+    btn.innerHTML = `<span class="floor-num">${i}</span>${label}`;
+    btn.addEventListener('click', () => openConfirmModal(i, label));
+    grid.appendChild(btn);
+  }
+}
+
+function buildHeatmapRows() {
+  const grid = document.getElementById('heatmap-grid');
+  for (let i = 1; i <= CONFIG.NUM_FLOORS; i++) {
+    const label = CONFIG.FLOOR_LABELS[i-1] || `Floor ${i}`;
+    const row = document.createElement('div');
+    row.className = 'hm-row';
+    row.innerHTML = `
+      <span class="hm-label">${label}</span>
+      <div class="hm-bar-wrap">
+        <div class="hm-bar" id="hm-bar-${i}" data-count=""
+             style="width:0%;background:${FLOOR_COLORS[i-1]};"></div>
+      </div>
+      <span class="hm-count" id="hm-count-${i}">0</span>`;
+    grid.appendChild(row);
+  }
+}
+
+/* ── CONFIRM MODAL ────────────────────────────────────────── */
+function setupConfirmModal() {
+  const overlay = document.getElementById('modal-overlay');
+  document.getElementById('btn-confirm').addEventListener('click', confirmEntry);
+  document.getElementById('btn-cancel').addEventListener('click', closeConfirmModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeConfirmModal(); });
+}
+
+function openConfirmModal(floor, label) {
+  pendingFloor = floor;
+  document.getElementById('modal-floor').textContent = label;
+  document.getElementById('modal-sub').textContent =
+    `Reporting as ${identityName || 'anonymous'} — tap confirm to update everyone.`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeConfirmModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  pendingFloor = null;
+}
+
+function confirmEntry() {
+  if (!pendingFloor) return;
+  const floor = pendingFloor;
+  closeConfirmModal();
+  submitSighting(floor);
+}
+
+/* ── SUPABASE: WRITE ──────────────────────────────────────── */
+async function submitSighting(floor) {
+  setSyncState('syncing');
+  const tempId = `temp-${Date.now()}`;
+  entries.set(tempId, {
+    id: tempId,
+    created_at: new Date().toISOString(),
+    floor,
+    reporter_name: identityName
+  });
+  renderAll();
+  showToast(`✓ Floor ${floor} reported!`, false);
+
+  const { data, error } = await supabase
+    .from('sightings')
+    .insert({ floor, reporter_name: identityName })
+    .select()
+    .single();
+
+  entries.delete(tempId);
+  if (error) {
+    console.error('Insert failed:', error);
+    showToast('⚠ Failed to save — try again', true);
+  } else {
+    entries.set(data.id, data);
+  }
+  renderAll();
+  setSyncState('ok');
+}
+
+/* ── SUPABASE: READ ───────────────────────────────────────── */
+async function loadData() {
+  setSyncState('syncing');
+  const cutoff = new Date(Date.now() - CONFIG.HOURS_WINDOW * 3600000).toISOString();
+  const { data, error } = await supabase
+    .from('sightings')
+    .select('*')
+    .gte('created_at', cutoff)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Load failed:', error);
+    setSyncState('error', 'load failed');
+    return;
+  }
+  data.forEach(row => entries.set(row.id, row));
+  renderAll();
+  setSyncState('ok');
+}
+
+/* ── SUPABASE: REALTIME ───────────────────────────────────── */
+function subscribeRealtime() {
+  supabase
+    .channel('sightings-changes')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sightings' }, payload => {
+      entries.set(payload.new.id, payload.new);
+      renderAll();
+    })
+    .subscribe(status => {
+      if (status === 'SUBSCRIBED') setSyncState('ok', 'live');
+    });
+}
+
+/* ── RENDER ───────────────────────────────────────────────── */
+function sortedEntries() {
+  const cutoff = Date.now() - CONFIG.HOURS_WINDOW * 3600000;
+  return [...entries.values()]
+    .filter(e => +new Date(e.created_at) > cutoff)
+    .sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at));
+}
+
+function renderAll() {
+  const list = sortedEntries();
+  renderBanner(list);
+  renderButtons(list);
+  renderTimeline(list);
+  renderTable(list);
+  renderHeatmap(list);
+}
+
+function renderBanner(list) {
+  const labelEl   = document.getElementById('current-floor-label');
+  const timeAgoEl = document.getElementById('time-ago');
+  if (!list.length) {
+    labelEl.textContent  = '—';
+    labelEl.style.color  = 'var(--amber)';
+    timeAgoEl.textContent = 'No updates yet';
+    return;
+  }
+  const latest = list[list.length - 1];
+  labelEl.textContent = CONFIG.FLOOR_LABELS[latest.floor-1] || `Floor ${latest.floor}`;
+  labelEl.style.color = FLOOR_COLORS[(latest.floor-1) % FLOOR_COLORS.length];
+  timeAgoEl.textContent = timeAgo(new Date(latest.created_at));
+}
+
+function renderButtons(list) {
+  if (!list.length) return;
+  const cur = list[list.length - 1].floor;
+  document.querySelectorAll('.floor-btn').forEach(btn =>
+    btn.classList.toggle('is-current', parseInt(btn.dataset.floor) === cur)
+  );
+}
+
+function renderTimeline(list) {
+  const el = document.getElementById('timeline-list');
+  el.innerHTML = '';
+  if (!list.length) {
+    el.innerHTML = '<li class="empty">No data yet — tap a floor button to start.</li>';
+    return;
+  }
+  const segs = list.map((e, i) => ({
+    floor: e.floor,
+    who:   e.reporter_name,
+    start: new Date(e.created_at),
+    end:   list[i+1] ? new Date(list[i+1].created_at) : null
+  }));
+  [...segs].reverse().forEach((seg, idx) => {
+    const color = FLOOR_COLORS[(seg.floor-1) % FLOOR_COLORS.length];
+    const label = CONFIG.FLOOR_LABELS[seg.floor-1] || `Floor ${seg.floor}`;
+    const li = document.createElement('li');
+    li.className = 'tl-item' + (idx === 0 ? ' tl-current' : '');
+    li.style.setProperty('--accent', color);
+    li.innerHTML = `
+      <div class="tl-card">
+        <div>
+          <span class="tl-floor ${idx===0?'is-now':''}">${label}</span>
+          ${seg.who ? `<div class="tl-who">${escapeHtml(seg.who)}</div>` : ''}
+        </div>
+        <span class="tl-time">
+          ${fmtTime(seg.start)}${seg.end ? ' – '+fmtTime(seg.end) : ''}
+          ${seg.end ? '<br>'+durStr(seg.start,seg.end) : ''}
+        </span>
+        ${idx===0 ? '<span class="tl-badge-now">NOW</span>' : ''}
+      </div>`;
+    el.appendChild(li);
+  });
+}
+
+function renderTable(list) {
+  const tbody = document.getElementById('data-table-body');
+  tbody.innerHTML = '';
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="3" class="empty">No entries yet.</td></tr>';
+    return;
+  }
+  [...list].reverse().forEach(e => {
+    const color = FLOOR_COLORS[(e.floor-1) % FLOOR_COLORS.length];
+    const label = CONFIG.FLOOR_LABELS[e.floor-1] || `Floor ${e.floor}`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${fmtDateTime(new Date(e.created_at))}</td>
+      <td><span class="badge-floor" style="color:${color};border-color:${color}30">${label}</span></td>
+      <td style="color:var(--muted)">${escapeHtml(e.reporter_name) || '—'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderHeatmap(list) {
+  const counts = {};
+  for (let i=1; i<=CONFIG.NUM_FLOORS; i++) counts[i] = 0;
+  list.forEach(e => { if (counts[e.floor] !== undefined) counts[e.floor]++; });
+  const max = Math.max(1, ...Object.values(counts));
+  for (let i=1; i<=CONFIG.NUM_FLOORS; i++) {
+    const bar   = document.getElementById(`hm-bar-${i}`);
+    const count = document.getElementById(`hm-count-${i}`);
+    if (!bar || !count) continue;
+    const pct = counts[i] / max * 100;
+    bar.style.width   = pct>0 ? Math.max(pct,3)+'%' : '0%';
+    bar.style.opacity = 0.3 + 0.7*(counts[i]/max);
+    bar.dataset.count = counts[i]>0 ? counts[i] : '';
+    count.textContent = counts[i];
+  }
+}
+
+/* ── LOOPS (fallback poll, realtime is primary) ──────────── */
+function startLoops() {
+  clearInterval(refreshTimer);
+  clearInterval(timeAgoTimer);
+  refreshTimer = setInterval(loadData, CONFIG.REFRESH_MS);
+  timeAgoTimer = setInterval(() => {
+    const list = sortedEntries();
+    if (!list.length) return;
+    document.getElementById('time-ago').textContent =
+      timeAgo(new Date(list[list.length-1].created_at));
+  }, 15000);
+}
+
+/* ── SYNC CHIP ────────────────────────────────────────────── */
+function setSyncState(state, note) {
+  const chip  = document.getElementById('sync-chip');
+  const label = document.getElementById('sync-label');
+  const icon  = chip.querySelector('.sync-icon');
+  chip.classList.toggle('syncing', state === 'syncing');
+  if (state === 'syncing') {
+    icon.textContent  = '↻';
+    label.textContent = 'syncing...';
+  } else if (state === 'error') {
+    icon.textContent  = '⚠';
+    label.textContent = note || 'error';
+  } else {
+    icon.textContent  = '✓';
+    label.textContent = note || `updated ${fmtTime(new Date())}`;
+  }
+}
+
+/* ── TOAST ────────────────────────────────────────────────── */
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ── HELPERS ──────────────────────────────────────────────── */
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtTime(d) {
+  return d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+}
+function fmtDateTime(d) {
+  return d.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+function durStr(a, b) {
+  const m = Math.round((b-a)/60000);
+  if (m<1)  return '< 1 min';
+  if (m<60) return `${m} min`;
+  const h=Math.floor(m/60), r=m%60;
+  return r ? `${h}h ${r}m` : `${h}h`;
+}
+function timeAgo(d) {
+  const s = Math.floor((Date.now()-d)/1000);
+  if (s<30)    return 'just now';
+  if (s<90)    return '1 minute ago';
+  if (s<3600)  return `${Math.floor(s/60)} minutes ago`;
+  if (s<7200)  return '1 hour ago';
+  if (s<86400) return `${Math.floor(s/3600)} hours ago`;
+  return `${Math.floor(s/86400)} days ago`;
+}
+</script>
+</body>
+</html>
